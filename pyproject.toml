@@ -1,12 +1,15 @@
 [tool.poetry]
 name = "space-invaders"
-version = "0.1.0"
+version = "0.2.0"
 description = ""
 authors = ["Niklas Mueller <n.mueller@medienagentur24.eu>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+pygame = "^2.5.2"
+numpy = "^1.26.3"
+pyyaml = "^6.0.1"
 
 
 [build-system]
