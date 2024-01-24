@@ -10,10 +10,15 @@ def get_config() -> None:
 
 
 def load_assets() -> list[Player, Enemy]:
-    player_im = pygame.image.load("space_invaders/assets/player.png")
+    player_im = pygame.image.load("space_invaders/assets/red_rect.jpg")
     enemy_im = pygame.image.load("space_invaders/assets/alien.gif")
     background = pygame.image.load("space_invaders/assets/background.jpg")
     return [player_im, enemy_im, background]
+
+
+def rescale_image(image: pygame.Surface, scale: tuple[int, int]) -> pygame.Surface:
+    image = pygame.transform.scale(image, scale)
+    return image
 
 
 def main():
@@ -24,17 +29,23 @@ def main():
     ENEMY_BASE_SPEED = config["ENEMY_BASE_SPEED"]
     pygame.init()
 
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    
     clock = pygame.time.Clock()
-
     player_im, enemy_im, background = load_assets()
-    player = Player(player_im, 700, PLAYER_BASE_SPEED)
-    enemy = Enemy(enemy_im, 10, ENEMY_BASE_SPEED)
-
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    player_im = rescale_image(player_im, (0.1 * WIDTH, 0.1 * HEIGHT))
+    pygame.display.flip()
+    player = Player(
+        player_im,
+        (screen.get_rect().centerx - player_im.get_rect().width / 2, screen.get_rect().bottom - player_im.get_rect().height),
+        PLAYER_BASE_SPEED,
+    )
+    enemy = Enemy(enemy_im, (0, 10), ENEMY_BASE_SPEED)
+    print(screen.get_width())
+    print(player.pos)
+    black = 0, 0, 0
     while True:
-        screen.blit(background, player.pos, player.pos)
-        screen.blit(background, enemy.pos, enemy.pos)
+        screen.fill(black)
+        # screen.blit(background, enemy.pos, enemy.pos)
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             player.move(left=True)
@@ -44,9 +55,9 @@ def main():
             if event.type == pygame.QUIT:
                 sys.exit()
         screen.blit(player.image, player.pos)
-        screen.blit(enemy.image, enemy.pos)
+        # screen.blit(enemy.image, enemy.pos)
         pygame.display.flip()
-        clock.tick(120)
+        dt = clock.tick(60) / 1000
 
 
 if __name__ == "__main__":
