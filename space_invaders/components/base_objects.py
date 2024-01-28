@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from space_invaders.components.laser_controller import LaserController
 import pygame
 
 
@@ -19,3 +20,23 @@ class BaseObject(ABC):
     def move(self, *args):
         """Define movement of object"""
         pass
+
+
+class Alien(BaseObject):
+    def __init__(
+        self,
+        image,
+        initial_pos: tuple,
+        speed: int,
+        laser_controller: LaserController,
+    ) -> None:
+        super().__init__(image, initial_pos, speed)
+        self.laser_controller = laser_controller
+
+
+class PlayerObject(BaseObject):
+    def __init__(
+        self, image, initial_pos: tuple, speed: int, laser_controller: LaserController
+    ) -> None:
+        super().__init__(image, initial_pos, speed)
+        self.laser_controller = laser_controller
