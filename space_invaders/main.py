@@ -7,13 +7,8 @@ from space_invaders.components import (
     EnemyController,
     LaserController,
     GameHandler,
+    config
 )
-
-
-def get_config() -> None:
-    with open("space_invaders/config.yaml", "r") as file:
-        config = yaml.safe_load(file)
-    return config
 
 
 def load_assets() -> list[Player, Enemy]:
@@ -29,7 +24,6 @@ def rescale_image(image: pygame.Surface, scale: tuple[int, int]) -> pygame.Surfa
 
 
 def main():
-    config = get_config()
     WIDTH = config["WIDTH"]
     HEIGHT = config["HEIGHT"]
     PLAYER_BASE_SPEED = config["PLAYER_BASE_SPEED"]
@@ -52,13 +46,10 @@ def main():
     )
     positions = [((0.15 + 0.06 * i) * WIDTH, enemy_im.get_height()) for i in range(11)]
     weak_enemy_creator = EnemyCreator(type="weak")
-    enemy_controller = EnemyController()
+    enemy_controller = EnemyController(enemy_laser_controller)
     for position in positions:
-        enemy_controller.add_enemy(
-            weak_enemy_creator.create_enemy(
-                enemy_im, position, ENEMY_BASE_SPEED, enemy_laser_controller
-            )
-        )
+        new_enemy = weak_enemy_creator.create_enemy(enemy_im, position, ENEMY_BASE_SPEED)
+        new_enemy.add(enemy_controller)
     game = GameHandler(player, enemy_controller)
     game.game_loop()
 

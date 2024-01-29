@@ -1,5 +1,6 @@
 import yaml
-from space_invaders.components.base_objects import PlayerObject, Alien
+import pygame
+from space_invaders.components.base_objects import PlayerObject, BaseObject
 from space_invaders.components.laser_controller import Laser, LaserController
 
 
@@ -15,38 +16,33 @@ HEIGHT = config["HEIGHT"]
 
 
 class Player(PlayerObject):
-    def move(self, left: bool = False, right: bool = False) -> None:
+    def update(self, left: bool = False, right: bool = False) -> None:
         if left:
-            self.pos.right -= self.speed
+            self.rect.right -= self.speed
         if right:
-            self.pos.right += self.speed
-        if self.pos.right > WIDTH:
-            self.pos.right = WIDTH
-        if self.pos.left < 0:
-            self.pos.left = 0
+            self.rect.right += self.speed
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
 
     def shoot_laser(self, laser: Laser):
         self.laser_controller.add_laser(laser)
 
 
-class Enemy(Alien):
-    def __init__(
-        self, image, initial_pos: tuple, speed: int, laser_controller: LaserController
-    ) -> None:
-        super().__init__(image, initial_pos, speed, laser_controller)
+class Enemy(BaseObject):
+    def __init__(self, image: pygame.surface.Surface, initial_pos: tuple, speed: int) -> None:
+        super().__init__(image, initial_pos, speed)
         self.movement_direction = -1
 
     def switch_movement_direction(self):
         self.movement_direction *= -1
 
-    def move(self) -> None:
-        self.pos.left += self.movement_direction * self.speed
+    def update(self) -> None:
+        self.rect.left += self.movement_direction * self.speed
 
     def move_row_down(self) -> None:
-        self.pos.centery += 30
-
-    def shoot_laser(self, laser: Laser) -> None:
-        self.laser_controller.add_laser(laser)
+        self.rect.centery += 30
 
 
 class EnemyCreator:
@@ -56,8 +52,8 @@ class EnemyCreator:
         self.created_enemies = {"weak": 0}
         self.type = type
 
-    def create_enemy(self, *args):
+    def create_enemy(self, image: pygame.surface.Surface, initial_pos: tuple, speed: int):
         """Factory method for creating an Enemy instance."""
         self.created_enemies[self.type] += 1
         if self.type == "weak":
-            return Enemy(*args)
+            return Enemy(image, initial_pos, speed)

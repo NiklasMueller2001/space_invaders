@@ -17,8 +17,10 @@ WIDTH = config["WIDTH"]
 HEIGHT = config["HEIGHT"]
 PLAYER_BASE_SPEED = config["PLAYER_BASE_SPEED"]
 ENEMY_BASE_SPEED = config["ENEMY_BASE_SPEED"]
-LASER_BASE_SPEED = config["LASER_BASE_SPEED"]
 ENEMY_SHOOT_DELAY = config["ENEMY_SHOOT_DELAY"]
+LASER_BASE_SPEED = config["LASER_BASE_SPEED"]
+laser_im = pygame.image.load("space_invaders/assets/laser.png")
+laser_im = pygame.transform.scale(laser_im, (0.005 * WIDTH, 0.01 * HEIGHT))
 
 
 class GameHandler:
@@ -32,54 +34,50 @@ class GameHandler:
         pygame.display.flip()
 
     def game_loop(self) -> None:
-        laser_im = pygame.image.load("space_invaders/assets/laser.png")
-        laser_im = pygame.transform.scale(laser_im, (0.005 * WIDTH, 0.01 * HEIGHT))
-        last_shot_time = 0
         while True:
-            keys = pygame.key.get_pressed()
-            self.screen.fill(self.background)
-            for enemy in self.enemy_controller.enemies:
-                self.screen.blit(enemy.image, enemy.pos)
-            if keys[pygame.K_LEFT]:
-                self.player.move(left=True)
-            if keys[pygame.K_RIGHT]:
-                self.player.move(right=True)
-            if keys[pygame.K_SPACE]:
-                if not self.player.laser_controller.lasers:
-                    self.player.shoot_laser(
-                        Laser(laser_im, self.player.pos.midtop, LASER_BASE_SPEED)
-                    )
-            self.player.laser_controller.move_lasers()
-            for enemy_laser_controller in self.enemy_controller.laser_controllers:
-                enemy_laser_controller.move_lasers()
-            self.enemy_controller.move_enemies()
-            for laser in self.player.laser_controller.lasers:
-                if self.player.laser_controller.laser_is_out_of_screen(laser):
-                    self.player.laser_controller.lasers.remove(laser)
-            for laser_controller in self.enemy_controller.laser_controllers:
-                for laser in laser_controller.lasers:
-                    if laser_controller.laser_is_out_of_screen(laser):
-                        laser_controller.remove_laser(laser)
-            if self.enemy_controller.enemy_is_out_of_screen():
-                self.enemy_controller.move_enemies_row_down()
-                self.enemy_controller.switch_movement_direction()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
-            current_time = pygame.time.get_ticks()
-            if current_time - last_shot_time >= ENEMY_SHOOT_DELAY:
+            # Clear old images
+            self.enemy_controller.clear(self.screen, self._clear_callback)
+            self.enemy_controller.laser_controller.clear(self.screen, self._clear_callback)
+            self.player.laser_controller.clear(self.screen, self._clear_callback)
+            self._clear_callback(self.screen, self.player.rect)
+            # Check for user input
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.player.update(left=True)
+            if keys[pygame.K_RIGHT]:
+                self.player.update(right=True)
+            if keys[pygame.K_SPACE]:
+                if not self.player.laser_controller:
+                    self.player.laser_controller.add(
+                        Laser(laser_im, self.player.rect.midtop, LASER_BASE_SPEED)
+                    )
+            # Update enemies and laser positions
+            if self.player.laser_controller:
+                self.player.laser_controller.move_laser()
+            self.enemy_controller.laser_controller.move_laser()
+            self.enemy_controller.move_enemies()
+            if self.enemy_controller.enemy_is_out_of_screen():
+                self.enemy_controller.move_enemies_row_down()
+                self.enemy_controller.switch_movement_direction()
+            # Shoot new laser once old one is killed
+            if not self.enemy_controller.laser_controller:
                 chosen_enemy = self.enemy_controller.choose_random_enemy()
-                chosen_enemy.shoot_laser(
-                    Laser(laser_im, chosen_enemy.pos.midbottom, LASER_BASE_SPEED / 20)
+                self.enemy_controller.laser_controller.add(
+                    Laser(
+                        laser_im,
+                        chosen_enemy.rect.midbottom,
+                        LASER_BASE_SPEED,
+                    )
                 )
-                last_shot_time = current_time
-            self.screen.blit(self.player.image, self.player.pos)
-            for enemy in self.enemy_controller.enemies:
-                self.screen.blit(enemy.image, enemy.pos)
-            for laser in self.player.laser_controller.lasers:
-                self.screen.blit(laser.image, laser.pos)
-            for laser_controller in self.enemy_controller.laser_controllers:
-                for laser in laser_controller.lasers:
-                    self.screen.blit(laser.image, laser.pos)
+            self.screen.blit(self.player.image, self.player.rect)
+            self.enemy_controller.draw(self.screen)
+            self.player.laser_controller.draw(self.screen)
+            self.enemy_controller.laser_controller.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(60)
+
+    def _clear_callback(self, surf, rect):
+        surf.fill(self.background, rect)
