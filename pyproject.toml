@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "space-invaders"
-version = "0.2.0"
+version = "0.4.0"
 description = ""
 authors = ["Niklas Mueller <n.mueller@medienagentur24.eu>"]
 readme = "README.md"

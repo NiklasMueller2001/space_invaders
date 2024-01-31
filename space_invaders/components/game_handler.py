@@ -18,6 +18,8 @@ WIDTH = config["WIDTH"]
 HEIGHT = config["HEIGHT"]
 PLAYER_BASE_SPEED = config["PLAYER_BASE_SPEED"]
 ENEMY_BASE_SPEED = config["ENEMY_BASE_SPEED"]
+ENEMY_BLOCK_TIME = config["ENEMY_BLOCK_TIME"]
+ENEMY_UNBLOCK_TIME = config["ENEMY_UNBLOCK_TIME"]
 ENEMY_SHOOT_DELAY = config["ENEMY_SHOOT_DELAY"]
 LASER_BASE_SPEED = config["LASER_BASE_SPEED"]
 laser_im = pygame.image.load("space_invaders/assets/laser.png")
@@ -71,7 +73,14 @@ class GameHandler:
             dokillb=True,
         )
 
-    def load_new_level(self):
+    def unblock_enemy_movement(self) -> None:
+        """unblock the enemy"""
+        self.enemy_controller.is_blocked = False
+
+    def block_enemy_movement(self) -> None:
+        self.enemy_controller.is_blocked = True
+
+    def load_new_level(self) -> None:
         """Start the next level."""
         initial_enemies = next(self.level_generator)
         self.enemy_controller.add(initial_enemies)
@@ -87,6 +96,15 @@ class GameHandler:
 
     def game_loop(self) -> None:
         self.load_new_level()
+        UNBLOCK_ENEMIES = pygame.USEREVENT + 1
+        BLOCK_ENEMIES = pygame.USEREVENT + 2
+        pygame.time.set_timer(
+            UNBLOCK_ENEMIES, ENEMY_BLOCK_TIME + ENEMY_UNBLOCK_TIME
+        )
+        pygame.time.wait(ENEMY_UNBLOCK_TIME)
+        pygame.time.set_timer(
+            BLOCK_ENEMIES, ENEMY_BLOCK_TIME + ENEMY_UNBLOCK_TIME
+        )
         while True:
             # Check if level is finished
             if not self.enemy_controller:
@@ -94,6 +112,11 @@ class GameHandler:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
+            # Block enemy movement to create interrupted movement
+                if event.type == BLOCK_ENEMIES:
+                    self.block_enemy_movement()
+                if event.type == UNBLOCK_ENEMIES:
+                    self.unblock_enemy_movement()
             # Clear old images
             self._clear_all_objects()
             # Check for user input
@@ -111,12 +134,13 @@ class GameHandler:
             if self.player.laser_controller:
                 self.player.laser_controller.move_laser()
             self.enemy_controller.laser_controller.move_laser()
-            self.enemy_controller.move_enemies()
+            if not self.enemy_controller.is_blocked:
+                self.enemy_controller.move_enemies()
             if self.enemy_controller.enemy_is_out_of_screen():
                 self.enemy_controller.move_enemies_row_down()
                 self.enemy_controller.switch_movement_direction()
-            # Shoot new laser once old one is killed
-            if not self.enemy_controller.laser_controller:
+            # Shoot new laser once old one is removed from screen and enemies arent blocked
+            if not (self.enemy_controller.laser_controller or self.enemy_controller.is_blocked):
                 chosen_enemy = self.enemy_controller.choose_random_enemy()
                 self.enemy_controller.laser_controller.add(
                     Laser(

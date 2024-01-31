@@ -23,6 +23,7 @@ class EnemyController(pygame.sprite.Group):
     def __init__(self, lasercontroller: LaserController) -> None:
         super().__init__()
         self.laser_controller = lasercontroller
+        self.is_blocked = False
 
     def move_enemies(self) -> None:
         self.update()

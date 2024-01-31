@@ -1,5 +1,4 @@
 import pygame
-import yaml
 from space_invaders.components import (
     Player,
     Enemy,
@@ -28,7 +27,6 @@ def main():
     WIDTH = config["WIDTH"]
     HEIGHT = config["HEIGHT"]
     PLAYER_BASE_SPEED = config["PLAYER_BASE_SPEED"]
-    ENEMY_BASE_SPEED = config["ENEMY_BASE_SPEED"]
 
     player_im, enemy_im = load_assets()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -45,13 +43,9 @@ def main():
         PLAYER_BASE_SPEED,
         player_laser_controller,
     )
-    # positions = [((0.15 + 0.06 * i) * WIDTH, enemy_im.get_height()) for i in range(11)]
     weak_enemy_creator = EnemyCreator(type="weak")
     level_generator = LevelGenerator(weak_enemy_creator)
     enemy_controller = EnemyController(enemy_laser_controller)
-    # for position in positions:
-    #     new_enemy = weak_enemy_creator.create_enemy(enemy_im, position, ENEMY_BASE_SPEED)
-    #     new_enemy.add(enemy_controller)
     game = GameHandler(player, enemy_controller, level_generator)
     game.game_loop()
 
