@@ -1,7 +1,7 @@
 import yaml
 import pygame
 from space_invaders.components.base_objects import PlayerObject, BaseObject
-from space_invaders.components.laser_controller import Laser, LaserController
+from space_invaders.components.laser_controller import Laser
 
 
 def get_config() -> None:

@@ -1,6 +1,7 @@
 from space_invaders.components.objects import Player, Enemy
 from space_invaders.components.enemy_controller import EnemyController
 from space_invaders.components.laser_controller import Laser
+from space_invaders.components.level import LevelGenerator
 import pygame
 import sys
 import yaml
@@ -24,25 +25,77 @@ laser_im = pygame.transform.scale(laser_im, (0.005 * WIDTH, 0.01 * HEIGHT))
 
 
 class GameHandler:
-    def __init__(self, player: Player, enemy_controller: EnemyController) -> None:
+    def __init__(
+        self,
+        player: Player,
+        enemy_controller: EnemyController,
+        level_generator: LevelGenerator,
+    ) -> None:
         self.player = player
         self.enemy_controller = enemy_controller
+        self.level_generator = level_generator
         self.background = 0, 0, 0
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.init()
         pygame.display.flip()
 
+    def _clear_all_objects(self) -> None:
+        """Helper method that clears all visible objects from screen."""
+        self.enemy_controller.clear(self.screen, self._clear_callback)
+        self.enemy_controller.laser_controller.clear(self.screen, self._clear_callback)
+        self.player.laser_controller.clear(self.screen, self._clear_callback)
+        self._clear_callback(self.screen, self.player.rect)
+
+    def _draw_all_objects(self) -> None:
+        """Helper method that draws all visible objects on screen."""
+        self.screen.blit(self.player.image, self.player.rect)
+        self.enemy_controller.draw(self.screen)
+        self.player.laser_controller.draw(self.screen)
+        self.enemy_controller.laser_controller.draw(self.screen)
+
+    def _player_is_hit(self) -> None:
+        """Helper method that checks if player is hit by laser and removes a life if he was."""
+        for laser in pygame.sprite.spritecollide(
+            self.player, self.enemy_controller.laser_controller, dokill=False
+        ):
+            laser.kill()
+            self.player.lives -= 1
+
+    def _enemy_is_hit(self) -> None:
+        """Helper method that checks if an enemy is hit by laser and removes enemy if it was."""
+        pygame.sprite.groupcollide(
+            self.player.laser_controller,
+            self.enemy_controller,
+            dokilla=True,
+            dokillb=True,
+        )
+
+    def load_new_level(self):
+        """Start the next level."""
+        initial_enemies = next(self.level_generator)
+        self.enemy_controller.add(initial_enemies)
+        self.player.rect.move(
+            (
+                self.screen.get_rect().centerx - self.player.rect.width / 2,
+                self.screen.get_rect().bottom - self.player.rect.height,
+            )
+        )
+        self._clear_all_objects()
+        self._draw_all_objects()
+        pygame.display.update()
+
     def game_loop(self) -> None:
+        self.load_new_level()
         while True:
+            # Check if level is finished
+            if not self.enemy_controller:
+                self.load_new_level()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
             # Clear old images
-            self.enemy_controller.clear(self.screen, self._clear_callback)
-            self.enemy_controller.laser_controller.clear(self.screen, self._clear_callback)
-            self.player.laser_controller.clear(self.screen, self._clear_callback)
-            self._clear_callback(self.screen, self.player.rect)
+            self._clear_all_objects()
             # Check for user input
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
@@ -72,11 +125,15 @@ class GameHandler:
                         LASER_BASE_SPEED,
                     )
                 )
-            self.screen.blit(self.player.image, self.player.rect)
-            self.enemy_controller.draw(self.screen)
-            self.player.laser_controller.draw(self.screen)
-            self.enemy_controller.laser_controller.draw(self.screen)
-            pygame.display.flip()
+            # Check if player or enemy was hit
+            self._player_is_hit()
+            self._enemy_is_hit()
+            # Check if player still has 0 lives left
+            if self.player.lives == 0:
+                sys.exit()
+            # Draw all objects on screen
+            self._draw_all_objects()
+            pygame.display.update()
             self.clock.tick(60)
 
     def _clear_callback(self, surf, rect):

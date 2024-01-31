@@ -7,6 +7,7 @@ from space_invaders.components import (
     EnemyController,
     LaserController,
     GameHandler,
+    LevelGenerator,
     config
 )
 
@@ -44,13 +45,14 @@ def main():
         PLAYER_BASE_SPEED,
         player_laser_controller,
     )
-    positions = [((0.15 + 0.06 * i) * WIDTH, enemy_im.get_height()) for i in range(11)]
+    # positions = [((0.15 + 0.06 * i) * WIDTH, enemy_im.get_height()) for i in range(11)]
     weak_enemy_creator = EnemyCreator(type="weak")
+    level_generator = LevelGenerator(weak_enemy_creator)
     enemy_controller = EnemyController(enemy_laser_controller)
-    for position in positions:
-        new_enemy = weak_enemy_creator.create_enemy(enemy_im, position, ENEMY_BASE_SPEED)
-        new_enemy.add(enemy_controller)
-    game = GameHandler(player, enemy_controller)
+    # for position in positions:
+    #     new_enemy = weak_enemy_creator.create_enemy(enemy_im, position, ENEMY_BASE_SPEED)
+    #     new_enemy.add(enemy_controller)
+    game = GameHandler(player, enemy_controller, level_generator)
     game.game_loop()
 
 

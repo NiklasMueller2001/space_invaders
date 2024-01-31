@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from space_invaders.components.laser_controller import LaserController
 import pygame
 
@@ -23,4 +22,5 @@ class PlayerObject(BaseObject):
         self, image, initial_pos: tuple, speed: int, laser_controller: LaserController
     ) -> None:
         super().__init__(image, initial_pos, speed)
+        self.lives = 3
         self.laser_controller = laser_controller
