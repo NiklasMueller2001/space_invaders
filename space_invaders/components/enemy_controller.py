@@ -1,5 +1,5 @@
 from space_invaders.components.objects import Enemy
-from space_invaders.components.laser_controller import LaserController, Laser
+from space_invaders.components.laser import LaserController, Laser
 import pygame
 import random
 import yaml
