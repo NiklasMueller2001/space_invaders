@@ -1,7 +1,7 @@
 import yaml
 import pygame
-from space_invaders.components.base_objects import PlayerObject, BaseObject
-from space_invaders.components.laser_controller import Laser
+from space_invaders.components.base_objects import PlayerObject, MovableObject
+from space_invaders.components.laser import Laser
 
 
 def get_config() -> None:
@@ -30,8 +30,10 @@ class Player(PlayerObject):
         self.laser_controller.add_laser(laser)
 
 
-class Enemy(BaseObject):
-    def __init__(self, image: pygame.surface.Surface, initial_pos: tuple, speed: int) -> None:
+class Enemy(MovableObject):
+    def __init__(
+        self, image: pygame.surface.Surface, initial_pos: tuple, speed: int
+    ) -> None:
         super().__init__(image, initial_pos, speed)
         self.movement_direction = -1
 
@@ -52,7 +54,9 @@ class EnemyCreator:
         self.created_enemies = {"weak": 0}
         self.type = type
 
-    def create_enemy(self, image: pygame.surface.Surface, initial_pos: tuple, speed: int):
+    def create_enemy(
+        self, image: pygame.surface.Surface, initial_pos: tuple, speed: int
+    ):
         """Factory method for creating an Enemy instance."""
         self.created_enemies[self.type] += 1
         if self.type == "weak":
