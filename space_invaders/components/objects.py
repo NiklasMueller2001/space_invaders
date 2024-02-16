@@ -1,10 +1,11 @@
 import yaml
 import pygame
+from typing import Any
 from space_invaders.components.base_objects import PlayerObject, MovableObject
-from space_invaders.components.laser import Laser
+from space_invaders.components.laser import Laser, LaserController
 
 
-def get_config() -> None:
+def get_config() -> Any:
     with open("space_invaders/config.yaml", "r") as file:
         config = yaml.safe_load(file)
     return config
@@ -16,18 +17,21 @@ HEIGHT = config["HEIGHT"]
 
 
 class Player(PlayerObject):
-    def update(self, left: bool = False, right: bool = False) -> None:
+    def update(self, dt, left: bool = False, right: bool = False) -> None:
         if left:
-            self.rect.right -= self.speed
+            self.rect.right -= self.speed * dt
         if right:
-            self.rect.right += self.speed
+            self.rect.right += self.speed * dt
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
             self.rect.left = 0
 
     def shoot_laser(self, laser: Laser):
-        self.laser_controller.add_laser(laser)
+        self.laser_controller.add(laser)
+
+    def draw(self) -> None:
+        self.screen.blit(self.image, self.rect)
 
 
 class Enemy(MovableObject):
@@ -40,11 +44,11 @@ class Enemy(MovableObject):
     def switch_movement_direction(self):
         self.movement_direction *= -1
 
-    def update(self) -> None:
-        self.rect.left += self.movement_direction * self.speed
+    def update(self, dt) -> None:
+        self.rect.left += self.movement_direction * self.speed * dt
 
     def move_row_down(self) -> None:
-        self.rect.centery += 30
+        self.rect.centery += HEIGHT * 0.02
 
 
 class EnemyCreator:
