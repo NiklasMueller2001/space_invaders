@@ -33,7 +33,7 @@ class LevelGenerator:
                 enemies.append(new_enemy)
         return enemies
 
-    def __next__(self) -> Iterator[list[Enemy]]:
+    def __next__(self) -> list[Enemy]:
         self.level_number += 1
-        y_offset = 0.05 * WIDTH * (self.level_number - 1)
+        y_offset = 0.05 * HEIGHT * (self.level_number - 1)
         return self.initial_enemies(y_offset)
