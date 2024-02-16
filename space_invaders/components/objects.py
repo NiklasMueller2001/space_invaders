@@ -1,8 +1,9 @@
 import yaml
 import pygame
 from typing import Any
-from space_invaders.components.base_objects import PlayerObject, MovableObject
-from space_invaders.components.laser import Laser, LaserController
+from space_invaders.components.player import PlayerObject
+from space_invaders.components.base_objects import MovableObject
+from space_invaders.components.laser import Laser
 
 
 def get_config() -> Any:

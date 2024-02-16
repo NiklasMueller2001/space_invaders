@@ -1,7 +1,8 @@
-from space_invaders.components.blockade import Blockade, BlockadeGroup, BlockadeController 
+from space_invaders.components.blockade import Blockade, BlockadeGroup, BlockadeController
+from space_invaders.components.player import PlayerObject 
 from space_invaders.components.enemy_controller import EnemyController
 from space_invaders.components.laser import Laser, LaserController
-from space_invaders.components.base_objects import BaseObject, MovableObject, PlayerObject
+from space_invaders.components.base_objects import BaseObject, MovableObject
 from space_invaders.components.objects import Player, Enemy, EnemyCreator
 from space_invaders.components.level import LevelGenerator
 from space_invaders.components.game_handler import GameHandler

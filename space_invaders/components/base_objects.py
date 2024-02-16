@@ -1,4 +1,3 @@
-from space_invaders.components.laser import LaserController
 from typing import Self
 import pygame
 
@@ -30,12 +29,3 @@ class MovableObject(BaseObject):
         """Method for rescaling imag of object"""
         self.image = pygame.transform.scale_by(self.image, size)
         return self
-
-
-class PlayerObject(MovableObject):
-    def __init__(
-        self, image, initial_pos: tuple, speed: int, laser_controller: LaserController
-    ) -> None:
-        super().__init__(image, initial_pos, speed)
-        self.lives = 3
-        self.laser_controller = laser_controller
