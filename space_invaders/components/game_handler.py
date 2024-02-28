@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from space_invaders.components.laser import Laser
 from space_invaders.components.level import LevelGenerator
 from space_invaders.components.controller import GameObjectController
@@ -23,27 +24,24 @@ ENEMY_UNBLOCK_TIME = config["ENEMY_UNBLOCK_TIME"]
 ENEMY_SHOOT_DELAY = config["ENEMY_SHOOT_DELAY"]
 LASER_BASE_SPEED = config["LASER_BASE_SPEED"]
 laser_im = pygame.image.load("space_invaders/assets/laser.png")
-laser_im = pygame.transform.scale(laser_im, (0.003 * WIDTH, 0.03 * HEIGHT))
+laser_im = pygame.transform.scale(laser_im, (0.0025 * WIDTH, 0.03 * HEIGHT))
 
-class GameHandler:
+
+class GameHandlerBase(ABC):
+    """
+    Base class for all GameHandler objects.
+    """
+
     def __init__(
         self,
         game_object_controller: GameObjectController,
         level_generator: LevelGenerator,
     ) -> None:
         self.game_object_controller = game_object_controller
+        self.level_generator = level_generator
         self.player = game_object_controller.player
         self.enemy_controller = game_object_controller.enemy_controller
         self.blockade_controller = game_object_controller.blockade_controller
-        self.level_generator = level_generator
-        self.background = 0, 0, 0
-        self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        self.is_paused = False
-        self.game_time = 0
-        self.killed_enemies = 0
-        pygame.init()
-        pygame.display.flip()
 
     def unblock_enemy_movement(self) -> None:
         """Unblock all enemies."""
@@ -54,6 +52,30 @@ class GameHandler:
         """Block all enemies."""
 
         self.enemy_controller.is_blocked = True
+
+    @abstractmethod
+    def load_new_level(self) -> None:
+        pass
+
+    @abstractmethod
+    def game_loop(self) -> None:
+        pass
+
+
+class GameHandler(GameHandlerBase):
+    def __init__(
+        self,
+        game_object_controller: GameObjectController,
+        level_generator: LevelGenerator,
+    ) -> None:
+        super().__init__(game_object_controller, level_generator)
+        self.clock = pygame.time.Clock()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.is_paused = False
+        self.game_time = 0
+        self.killed_enemies = 0
+        pygame.init()
+        pygame.display.flip()
 
     def load_new_level(self) -> None:
         """Start the next level."""
