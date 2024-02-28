@@ -1,11 +1,19 @@
-from space_invaders.components.blockade import Blockade, BlockadeGroup, BlockadeController
-from space_invaders.components.player import PlayerObject 
-from space_invaders.components.enemy_controller import EnemyController
-from space_invaders.components.laser import Laser, LaserController
+from space_invaders.components.blockade import (
+    Blockade,
+    BlockadeGroup,
+)
+from space_invaders.components.player import Player, PlayerObject
+from space_invaders.components.laser import Laser
 from space_invaders.components.base_objects import BaseObject, MovableObject
-from space_invaders.components.objects import Player, Enemy, EnemyCreator
+from space_invaders.components.objects import Enemy, EnemyCreator
 from space_invaders.components.level import LevelGenerator
 from space_invaders.components.game_handler import GameHandler
+from space_invaders.components.controller import (
+    EnemyController,
+    LaserController,
+    BlockadeController,
+    GameObjectController,
+)
 import yaml
 
 with open("space_invaders/config.yaml", "r") as file:
@@ -26,5 +34,6 @@ all = [
     LaserController,
     LevelGenerator,
     GameHandler,
-    config
+    GameObjectController,
+    config,
 ]

@@ -1,9 +1,7 @@
 import yaml
 import pygame
 from typing import Any
-from space_invaders.components.player import PlayerObject
 from space_invaders.components.base_objects import MovableObject
-from space_invaders.components.laser import Laser
 
 
 def get_config() -> Any:
@@ -15,24 +13,6 @@ def get_config() -> Any:
 config = get_config()
 WIDTH = config["WIDTH"]
 HEIGHT = config["HEIGHT"]
-
-
-class Player(PlayerObject):
-    def update(self, dt, left: bool = False, right: bool = False) -> None:
-        if left:
-            self.rect.right -= self.speed * dt
-        if right:
-            self.rect.right += self.speed * dt
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-
-    def shoot_laser(self, laser: Laser):
-        self.laser_controller.add(laser)
-
-    def draw(self) -> None:
-        self.screen.blit(self.image, self.rect)
 
 
 class Enemy(MovableObject):

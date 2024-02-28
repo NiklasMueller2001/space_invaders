@@ -1,5 +1,4 @@
 from space_invaders.components.objects import EnemyCreator, Enemy
-from typing import Any, Iterator
 import pygame
 import yaml
 

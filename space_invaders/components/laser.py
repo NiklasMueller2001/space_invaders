@@ -33,14 +33,3 @@ class Laser(pygame.sprite.Sprite):
         elif self.rect.top > HEIGHT:
             return True
         return False
-
-
-class LaserController(pygame.sprite.GroupSingle):
-    """Class for handling Laser objects."""
-
-    def __init__(self, laser_direction: str) -> None:
-        super().__init__()
-        self.laser_direction = laser_direction
-
-    def move_laser(self, dt) -> None:
-        self.update(direction=self.laser_direction, dt=dt)
