@@ -40,13 +40,34 @@ class LaserController(pygame.sprite.GroupSingle):
 
 
 class EnemyController(pygame.sprite.Group):
+    """
+    A controller class that manages all enemies in the game.
+
+    Attributes
+    ----------
+    laser_controller : LaserController, default=lasercontroller
+        The control class instance that controls the lasers shot by all enemies.
+    current_enemy_speed : float, default=ENEMY_BASE_SPEED
+        The current speed of all enemy instances.
+    is_blocked : bool, default=True
+        Indicates wether enemies can move (False) or not (True).
+    """
+
     def __init__(self, lasercontroller: LaserController) -> None:
         super().__init__()
         self.laser_controller = lasercontroller
         self.current_enemy_speed = ENEMY_BASE_SPEED
         self.is_blocked = True
 
+    @property
+    def enemy_height(self):
+        """Get the y-position of the lowest enemy in the game."""
+
+        return max(map(lambda enemy: enemy.rect.bottom, self.sprites()))
+
     def set_enemy_speed(self, new_speed) -> None:
+        """Set the speed for all controlled enemy objects."""
+
         self.current_enemy_speed = new_speed
         for enemy in self.sprites():
             enemy.speed = self.current_enemy_speed

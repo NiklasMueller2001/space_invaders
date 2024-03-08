@@ -164,6 +164,9 @@ class GameHandler(GameHandlerBase):
                     self.enemy_controller.move_enemies(dt)
                     if self.enemy_controller.enemy_is_out_of_screen():
                         self.enemy_controller.move_enemies_row_down()
+                        # Exit game if enemy makes it to the bottom
+                        if self.enemy_controller.enemy_height >= HEIGHT:
+                            sys.exit()
                         self.enemy_controller.switch_movement_direction()
                 # Shoot new laser once old one is removed from screen and enemies aren't blocked
                 if not (
