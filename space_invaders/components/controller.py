@@ -3,7 +3,7 @@ from space_invaders.components.objects import Enemy
 from space_invaders.components.laser import Laser
 from space_invaders.components.blockade import Blockade, BlockadeGroup
 from space_invaders.components.player import Player
-from typing import Any
+from typing import Any, Optional
 import pygame
 import random
 import yaml
@@ -223,24 +223,27 @@ class GameObjectController:
     def screen(self) -> pygame.Surface:
         return pygame.display.get_surface()
 
-    def _clear_all_objects(self) -> None:
-        """Helper method that clears all visible objects from screen."""
+    def _clear_all_objects(self, surf: pygame.Surface | None = None) -> None:
+        """Helper method that clears all visible objects from specified surface."""
 
-        self.enemy_controller.clear(self.screen, self._clear_callback)
-        self.enemy_controller.laser_controller.clear(self.screen, self._clear_callback)
-        self.player.laser_controller.clear(self.screen, self._clear_callback)
-        self.blockade_controller.blockade_group.clear(self.screen, self._clear_callback)
-        self._clear_callback(self.screen, self.player.rect)
+        if surf is None:
+            surf = self.screen
+        self.enemy_controller.clear(surf, self._clear_callback)
+        self.enemy_controller.laser_controller.clear(surf, self._clear_callback)
+        self.player.laser_controller.clear(surf, self._clear_callback)
+        self.blockade_controller.blockade_group.clear(surf, self._clear_callback)
+        self._clear_callback(surf, self.player.rect)
 
-    def _draw_all_objects(self) -> None:
-        """Helper method that draws all visible objects on screen."""
+    def _draw_all_objects(self, surf: pygame.Surface | None = None) -> None:
+        """Helper method that draws all visible objects on specified surface."""
 
-        self.player.draw()
-        self.enemy_controller.draw(self.screen)
-        self.player.laser_controller.draw(self.screen)
-        self.enemy_controller.laser_controller.draw(self.screen)
-        # print(self.blockade_controller.blockade_group)
-        self.blockade_controller.draw(self.screen)
+        if surf is None:
+            surf = self.screen
+        surf.blit(self.player.image, self.player.rect)
+        self.enemy_controller.draw(surf)
+        self.player.laser_controller.draw(surf)
+        self.enemy_controller.laser_controller.draw(surf)
+        self.blockade_controller.draw(surf)
 
     def _clear_callback(self, surf, rect):
         """Helper function to blit background onto specified position."""

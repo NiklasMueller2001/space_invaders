@@ -42,6 +42,7 @@ class GameHandlerBase(ABC):
         self.player = game_object_controller.player
         self.enemy_controller = game_object_controller.enemy_controller
         self.blockade_controller = game_object_controller.blockade_controller
+        self.game_time = 0
 
     def unblock_enemy_movement(self) -> None:
         """Unblock all enemies."""
@@ -57,10 +58,6 @@ class GameHandlerBase(ABC):
     def load_new_level(self) -> None:
         pass
 
-    @abstractmethod
-    def game_loop(self) -> None:
-        pass
-
 
 class GameHandler(GameHandlerBase):
     def __init__(
@@ -72,7 +69,6 @@ class GameHandler(GameHandlerBase):
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.is_paused = False
-        self.game_time = 0
         self.killed_enemies = 0
         pygame.init()
         pygame.display.flip()

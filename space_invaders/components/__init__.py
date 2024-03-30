@@ -7,7 +7,7 @@ from space_invaders.components.laser import Laser
 from space_invaders.components.base_objects import BaseObject, MovableObject
 from space_invaders.components.objects import Enemy, EnemyCreator
 from space_invaders.components.level import LevelGenerator
-from space_invaders.components.game_handler import GameHandler
+from space_invaders.components.game_handler import GameHandler, GameHandlerBase
 from space_invaders.components.controller import (
     EnemyController,
     LaserController,
@@ -34,6 +34,7 @@ all = [
     LaserController,
     LevelGenerator,
     GameHandler,
+    GameHandlerBase,
     GameObjectController,
     config,
 ]
