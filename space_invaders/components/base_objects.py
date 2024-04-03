@@ -27,12 +27,6 @@ class MovableObject(ABC, BaseObject):
         self.speed = speed
         self.rect = image.get_rect(topleft=(0, 0)).move(initial_pos)
 
-    def rescale(self, size: tuple[int, int]) -> Self:
-        """Method for rescaling imag of object"""
-
-        self.image = pygame.transform.scale_by(self.image, size)
-        return self
-
     @abstractmethod
     def update(self) -> None:
         """Define the movement of the sprite."""

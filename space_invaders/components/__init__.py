@@ -8,6 +8,7 @@ from space_invaders.components.base_objects import BaseObject, MovableObject
 from space_invaders.components.objects import Enemy, EnemyCreator
 from space_invaders.components.level import LevelGenerator
 from space_invaders.components.game_handler import GameHandler, GameHandlerBase
+from space_invaders.components.scoreboard import ScoreBoard, LiveIcon
 from space_invaders.components.controller import (
     EnemyController,
     LaserController,
@@ -36,5 +37,7 @@ all = [
     GameHandler,
     GameHandlerBase,
     GameObjectController,
+    LiveIcon,
+    ScoreBoard,
     config,
 ]

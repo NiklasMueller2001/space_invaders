@@ -10,11 +10,13 @@ from space_invaders.components import (
     GameObjectController,
     GameHandler,
     LevelGenerator,
+    ScoreBoard,
     config,
 )
 
+
 def load_assets() -> list[Any]:
-    player_im = pygame.image.load("space_invaders/assets/red_rect.jpg")
+    player_im = pygame.image.load("space_invaders/assets/player.png")
     enemy_im = pygame.image.load("space_invaders/assets/alien.gif")
     blockade_im = pygame.image.load("space_invaders/assets/blockade.png")
     return [player_im, enemy_im, blockade_im]
@@ -51,8 +53,11 @@ def main():
     enemy_controller = EnemyController(enemy_laser_controller)
     blockade_group = BlockadeGroup()
     blockade_controller = BlockadeController(blockade_im, blockade_group)
-    game_obj_controller = GameObjectController(player, enemy_controller, blockade_controller)
-    game = GameHandler(game_obj_controller, level_generator)
+    scoreboard = ScoreBoard(player_im)
+    game_obj_controller = GameObjectController(
+        player, enemy_controller, blockade_controller
+    )
+    game = GameHandler(game_obj_controller, level_generator, scoreboard)
     game.game_loop()
 
 

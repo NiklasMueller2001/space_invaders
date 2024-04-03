@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from space_invaders.components.laser import Laser
 from space_invaders.components.level import LevelGenerator
 from space_invaders.components.controller import GameObjectController
+from space_invaders.components.scoreboard import ScoreBoard
 from typing import Any
 import pygame
 import sys
@@ -23,6 +24,7 @@ ENEMY_BLOCK_TIME = config["ENEMY_BLOCK_TIME"]
 ENEMY_UNBLOCK_TIME = config["ENEMY_UNBLOCK_TIME"]
 ENEMY_SHOOT_DELAY = config["ENEMY_SHOOT_DELAY"]
 LASER_BASE_SPEED = config["LASER_BASE_SPEED"]
+BACKGROUND = config["BACKGROUND"]
 laser_im = pygame.image.load("space_invaders/assets/laser.png")
 laser_im = pygame.transform.scale(laser_im, (0.0025 * WIDTH, 0.03 * HEIGHT))
 
@@ -64,12 +66,18 @@ class GameHandler(GameHandlerBase):
         self,
         game_object_controller: GameObjectController,
         level_generator: LevelGenerator,
+        scoreboard: ScoreBoard,
+        player_lives: int = 3,
     ) -> None:
         super().__init__(game_object_controller, level_generator)
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         self.is_paused = False
         self.killed_enemies = 0
+        self.scoreboard = scoreboard
+        """Add initial lives."""
+        for _ in range(player_lives):
+            self.scoreboard.add_live()
         pygame.init()
         pygame.display.flip()
 
@@ -87,6 +95,15 @@ class GameHandler(GameHandlerBase):
         self.game_object_controller._clear_all_objects()
         self.game_object_controller._draw_all_objects()
         pygame.display.update()
+
+    def _update_scoreboard(self) -> None:
+        """Update the displayed scoreboard."""
+        self.scoreboard.clear_score(self.screen)
+        self.scoreboard.clear(
+            self.screen, lambda surf, rect: surf.fill(BACKGROUND, rect)
+        )
+        self.scoreboard.draw_score(self.screen)
+        self.scoreboard.draw(self.screen)
 
     def game_loop(self) -> None:
         self.load_new_level()
@@ -140,9 +157,10 @@ class GameHandler(GameHandlerBase):
                 if self.player.laser_controller:
                     self.game_object_controller._check_blockade_hit_by_player_laser()
                 if self.game_object_controller._check_player_hit():
-                    self.player.lives -= 1
+                    self.scoreboard.remove_live()
                 if self.game_object_controller._check_enemy_hit():
                     self.killed_enemies += 1
+                    self.scoreboard.score += 5
                     if self.killed_enemies % 9 == 0:
                         # Increase enemy speed based on number of remaining enemies
                         new_enemy_speed = (
@@ -178,9 +196,10 @@ class GameHandler(GameHandlerBase):
                         )
                     )
                 # Check if player has 0 lives left
-                if self.player.lives == 0:
+                if self.scoreboard.lives == 0:
                     sys.exit()
                 # Draw all objects on screen
                 self.game_object_controller._draw_all_objects()
+                self._update_scoreboard()
                 pygame.display.update()
                 self.game_time += 1
