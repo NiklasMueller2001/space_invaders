@@ -1,13 +1,16 @@
 # Space invaders
 
+![Environment demo](demo_images.gif)
+
 In this project I am using the `pygame` package to rebuild the classic 1978 Space invaders game. As this is my first attempt of building a computer game, the project serves mainly as an opportunity to learn new concepts about game development while incorporating software design patterns that try to keep the code as clean as possible. The following text serves to give an overview of the most important components that make up this project.
 
 # Usage
 Currently the only way to execute the program is via the `main.py` script in the space_invaders root folder. 
 
 # Future Milestones
-- &#9744; Create a score system and scoreboard
-- &#9744; Create custom *openai* `gymnasium` environment for Reinforcement Learning
+- &#9745; Create a score system and scoreboard
+- &#9745; Create custom *openai* `gymnasium` environment for Reinforcement Learning
+- &#9744; Publish project to Pip
 
 # Overview
 
@@ -62,3 +65,26 @@ This class manages the evolution of the game by defining the game loop. It check
 
 ## Configurations
 The values of every internal game setting can be modified in the `config.yaml` file in the components folder.
+
+## Gym Environment
+
+I refactored parts of the existing code for the space invaders game to create a backend for an environment that can be accessed by a computer rather than a player. Additionally, I registered the environment to the `Env` API from the popular reinforcement library `gymnasium`. After installing the package, the environment can be simply accessed via an import of `space_invaders`: 
+```Python
+import space_invaders
+import gymnasium
+
+env = gymnasium.make("CustomSpaceInvaders-v0", render_mode="rgb_array")
+# Reset environment
+env.reset()
+# Game loop
+terminated = False
+while not terminated:
+    obs, reward, terminated, False, info = env.step(action=env.action_space.sample())
+```
+Parameters that can be passed to the `.make()` constructor include:
+- width: int = 200
+    - The pixel width of the array that is returned as the observable from the `step` method.
+- heigth: int = 150
+    - The pixel height of the array that is returned as the observable from the `step` method.
+- render_mode: str = "human"
+    - Supported render modes are "human", "rgb_array" and "gray_scale_array".
