@@ -10,7 +10,12 @@ python = "^3.12"
 pygame = "^2.5.2"
 numpy = "^1.26.3"
 pyyaml = "^6.0.1"
+gymnasium = "^0.29.1"
+pillow = "^10.2.0"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
 
 [build-system]
 requires = ["poetry-core"]
