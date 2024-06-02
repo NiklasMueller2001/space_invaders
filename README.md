@@ -86,5 +86,7 @@ Parameters that can be passed to the `.make()` constructor include:
     - The pixel width of the array that is returned as the observable from the `step` method.
 - heigth: int = 150
     - The pixel height of the array that is returned as the observable from the `step` method.
-- render_mode: str = "human"
+- render_mode: Literal["human", "rgb_array", "gray_scale_array"] = "human"
     - Supported render modes are "human", "rgb_array" and "gray_scale_array".
+- reward: Optional[dict[Literal["enemy_kill", "player_damage"], int]] = None
+    - Specify the amount of reward that the environment returns for hitting an enemy and being hit by the enemy.
