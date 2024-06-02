@@ -68,10 +68,16 @@ class SpaceInvadersEnv(Env, GameHandlerBase):
         width: int = 200,
         heigth: int = 150,
         render_mode: Literal["human", "rgb_array", "gray_scale_array"] = "human",
+        reward: Optional[dict[Literal["enemy_kill", "player_damage"], int]] = None
     ) -> None:
         self.width = width
         self.height = heigth
         self.render_mode = render_mode
+        self.enemy_kill_reward : int = 1
+        self.player_damage_reward : int = -1
+        if reward is not None:
+            self.enemy_kill_reward = reward.get("enemy_kill") # type: ignore
+            self.player_damage_reward = reward.get("player_damage") # type: ignore
         super().__init__(game_object_controller, level_generator)
         # Observations will be entire visible screen, resized to specified shape
         if self.render_mode == "gray_scale_array":
@@ -158,9 +164,9 @@ class SpaceInvadersEnv(Env, GameHandlerBase):
             self.game_object_controller._check_blockade_hit_by_player_laser()
         if self.game_object_controller._check_player_hit():
             self.player.lives -= 1
-            reward -= 5
+            reward += self.player_damage_reward
         if self.game_object_controller._check_enemy_hit():
-            reward += 1
+            reward += self.enemy_kill_reward
             # Increase enemy speed based on number of remaining enemies
             if self.number_of_remaining_enemies % 9 == 0:
                 new_enemy_speed = 1.1 * self.enemy_controller.current_enemy_speed
@@ -196,7 +202,7 @@ class SpaceInvadersEnv(Env, GameHandlerBase):
         raw_obs = self.render_frame()
         obs = np.array(Image.fromarray(raw_obs).resize((self.height, self.width)))
         if self.render_mode == "gray_scale_array":
-            obs = obs[...,:3] @ [0.299, 0.587, 0.114]
+            obs = obs[..., :3] @ [0.299, 0.587, 0.114]
             obs = obs.round().astype(np.uint8)
         self.game_time += 1
         info = self.info
