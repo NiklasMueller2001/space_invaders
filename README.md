@@ -5,12 +5,12 @@
 In this project I am using the `pygame` package to rebuild the classic 1978 Space invaders game. As this is my first attempt of building a computer game, the project serves mainly as an opportunity to learn new concepts about game development while incorporating software design patterns that try to keep the code as clean as possible. The following text serves to give an overview of the most important components that make up this project.
 
 # Usage
-Currently the only way to execute the program is via the `main.py` script in the space_invaders root folder. 
+Currently the only way to play the game yourself is via running the `main.py` script in the space_invaders root folder. For using an autonomous agent to play the game refer to the section `Gym Environment`.
 
 # Future Milestones
 - &#9745; Create a score system and scoreboard
 - &#9745; Create custom *openai* `gymnasium` environment for Reinforcement Learning
-- &#9744; Publish project to Pip
+- &#9745; Publish project to Pip
 
 # Overview
 
