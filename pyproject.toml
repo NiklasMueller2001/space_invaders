@@ -1,9 +1,10 @@
 [tool.poetry]
-name = "space-invaders"
+name = "space-invaders-niklas-mueller"
 version = "1.0.0"
-description = ""
+description = "A custom space invaders game using Pygame for human and computer players."
 authors = ["Niklas Mueller <n.mueller@medienagentur24.eu>"]
 readme = "README.md"
+packages = [{include = "space_invaders"}]
 
 [tool.poetry.dependencies]
 python = "^3.12"
